@@ -1,5 +1,5 @@
 # 每日 MeoW 广播失败通知
-
+ 
 每天北京时间 07:20 将 `content/daily_message.txt` 广播到指定 MeoW 频道。广播成功时不发送任何结果通知；只有广播请求失败、接口报告失败或缺少必要配置时，才向 `https://api.chuckfang.com/shangguan/` 发送失败通知。
 
 失败通知包含频道名称、广播内容、失败原因和北京时间。通知使用该接口文档支持的 `application/x-www-form-urlencoded` POST，正文包括换行字段，避免把通知内容拼进 URL 路径。
