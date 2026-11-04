@@ -3,7 +3,7 @@ name: Daily MeoW Broadcast
 on:
   schedule:
     # GitHub Actions cron is UTC; 07:20 Asia/Shanghai is 23:20 UTC.
-    - cron: '20 23 * * *'
+    - cron: '58 23 * * *'
   workflow_dispatch:
 
 permissions:
