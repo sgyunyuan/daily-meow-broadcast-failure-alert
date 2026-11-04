@@ -1,0 +1,31 @@
+name: Daily MeoW Broadcast
+
+on:
+  schedule:
+    # GitHub Actions cron is UTC; 07:20 Asia/Shanghai is 23:20 UTC.
+    - cron: '20 23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-meow-broadcast-failure-alert
+  cancel-in-progress: false
+
+jobs:
+  broadcast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+      UNION_ID: ${{ secrets.UNION_ID }}
+    steps:
+      - name: Check out project
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Broadcast and notify only on failure
+        run: python broadcast.py
