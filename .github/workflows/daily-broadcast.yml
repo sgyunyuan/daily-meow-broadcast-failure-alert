@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write   # ✅ 允许保活 push
 
 concurrency:
   group: daily-meow-broadcast-failure-alert
@@ -23,9 +23,25 @@ jobs:
     steps:
       - name: Check out project
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}   # ✅ 用 PAT，public/private 都支持
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
       - name: Broadcast and notify only on failure
         run: python broadcast.py
+
+      # ✅ 保活提交（防止 60 天无 commit 导致定时任务被禁用）
+      - name: 保活提交
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .keepalive-meow
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .keepalive-meow
+          git diff --staged --quiet || git commit -m "chore: meow keepalive $(date -u +%Y-%m-%d)"
+          git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
