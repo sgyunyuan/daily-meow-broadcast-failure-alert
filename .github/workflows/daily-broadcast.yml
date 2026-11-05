@@ -2,12 +2,12 @@ name: Daily MeoW Broadcast
 
 on:
   schedule:
-    # GitHub Actions cron is UTC; 07:20 Asia/Shanghai is 23:20 UTC.
-    - cron: '58 23 * * *'
+    # GitHub Actions cron is UTC; 07:00 Asia/Shanghai is 23:00 UTC.
+    - cron: '0 23 * * *'
   workflow_dispatch:
 
 permissions:
-  contents: write   # ✅ 允许保活 push
+  contents: write   # ✅ 保活提交需要写权限
 
 concurrency:
   group: daily-meow-broadcast-failure-alert
@@ -20,11 +20,12 @@ jobs:
     env:
       CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
       UNION_ID: ${{ secrets.UNION_ID }}
+      REPORT_MODE: ${{ secrets.REPORT_MODE }}   # ✅ 新增：all / success / fail / none
     steps:
       - name: Check out project
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_TOKEN }}   # ✅ 用 PAT，public/private 都支持
+          token: ${{ secrets.GH_TOKEN }}   # ✅ PAT，public/private 都能用
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -36,6 +37,8 @@ jobs:
 
       # ✅ 保活提交（防止 60 天无 commit 导致定时任务被禁用）
       - name: 保活提交
+        if: always()   # ✅ 广播失败也照常保活
+        continue-on-error: true   # ✅ 保活失败不让整个 workflow 标红
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
