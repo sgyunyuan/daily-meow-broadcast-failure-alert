@@ -1,6 +1,6 @@
 # 每日 MeoW 广播机器人
 
-每天北京时间 07:58 将 `content/daily_message.txt` 广播到指定 MeoW 频道。支持推送结果上报模式控制，默认仅广播失败时发送通知。
+每天北京时间 07:08 将 `content/daily_message.txt` 广播到指定 MeoW 频道。支持推送结果上报模式控制，默认仅广播失败时发送通知。
 
 ## 功能
 
