@@ -24,7 +24,7 @@
 | `fail` | ❌ | ✅ | 仅上报失败（默认） |
 | `none` | ❌ | ❌ | 完全不上报 |
 
-失败通知发送到 `https://api.chuckfang.com/shangguan/`，使用 `application/x-www-form-urlencoded` POST，正文包含频道名称、广播内容、失败原因和北京时间。
+失败通知发送到 `https://api.chuckfang.com/昵称/`，使用 `application/x-www-form-urlencoded` POST，正文包含频道名称、广播内容、失败原因和北京时间。
 
 ## 配置
 
