@@ -45,8 +45,14 @@ def should_notify(success: bool) -> bool:
     return True  # all
 
 
+def is_already_broadcasted(detail: str) -> bool:
+    """判断是否为『今天已广播过』这类业务提示（不算真正失败）。"""
+    keywords = ("今天已经广播", "今日已", "已经广播", "already broadcast", "重复广播")
+    return any(k in detail for k in keywords)
+
+
 def call_api(url: str, *, method: str, body: bytes | None = None, content_type: str | None = None) -> tuple[int, bytes]:
-    headers = {"User-Agent": "daily-meow-broadcast-failure-alert/1.1"}
+    headers = {"User-Agent": "daily-meow-broadcast-failure-alert/1.2"}
     if content_type:
         headers["Content-Type"] = content_type
     request = Request(url, data=body, headers=headers, method=method)
@@ -180,8 +186,16 @@ def main() -> int:
         except json.JSONDecodeError:
             raise BroadcastFailure(f"广播接口响应不是有效 JSON：{response_text[:1000]}") from None
 
+        detail = str(result.get("msg", result))
+
+        # ✅ 业务提示『今天已广播过』：不算失败，退出码 0，GitHub 不标红
+        if is_already_broadcasted(detail):
+            print(f"业务提示（不标红）：{detail}")
+            if should_notify(success=True):
+                send_success_notification(channel_name, content, datetime.now(TIMEZONE))
+            return 0
+
         if result.get("status") != 200 or result.get("data") is not True:
-            detail = str(result.get("msg", result))
             raise BroadcastFailure(f"广播接口报告失败：{detail[:1000]}")
 
         print("Broadcast succeeded.")
